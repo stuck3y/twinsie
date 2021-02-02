@@ -2,15 +2,49 @@ from flask import Flask
 
 app = Flask(__name__)
 
+def pos_compare(string1, string2, window=3):
+    """Compare the positions of words in the two strings. Scored based on tolerance window, 3 words by default."""
+    def makeDict(s):
+        """Convert a string to a dict indexed at each word. Each word's position is stored in a list at it's index. """
+        s_dict = dict()
+        s_list = s.split()
+        for word in s_list:
+            s_dict[word] = [i for i, x in enumerate(s_list) if x == word]
+        return s_dict
+
+    dict1 = makeDict(string1)
+    dict2 = makeDict(string2)
+    
+    pos_counter = 0
+    pos_matches = 0
+    for word, pos_list in dict1.items():
+        for pos in pos_list:
+            pos_counter += 1
+            upper_bound = pos + window
+            lower_bound = pos - window
+            for i in range(lower_bound, upper_bound):
+                if i in dict2[word]:
+                    pos_matches += 1
+                    break
+    
+    pos_raw_score = pos_matches/pos_counter
+    return pos_raw_score
+
+def char_compare(string1, string2):
+    """Compare two strings by character to determine similarity."""
+    common_chars = set(string1) & set(string2)
+    all_chars = set(string1) | set(string2)
+    char_raw_score = len(common_chars)/len(all_chars)
+    return char_raw_score
+
 def compare(string1, string2):
+    """Compare two sentences or phrases by word to determine similarity."""
     def sentence_to_set(s):
         return set(s.split())
 
     common_words = sentence_to_set(string1) & sentence_to_set(string2)
     all_words = sentence_to_set(string1) | sentence_to_set(string2)
-
     raw_score = len(common_words)/len(all_words)
-    
     return raw_score
 
 @app.route('/')
@@ -26,5 +60,4 @@ def run():
     msg2 = f'Sample 1 compared to sample 3: {score}'
 
     return f'{msg1}\n{msg2}'
-
 
