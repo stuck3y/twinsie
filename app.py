@@ -2,6 +2,26 @@ from flask import Flask
 
 app = Flask(__name__)
 
+def main_compare(string1, string2):
+    
+    # compare words - simplest
+    word_score = word_compare(string1, string2)
+    remainder = 1 - word_score
+
+    # for leftover non-matches compare characters
+    # get string 1 words not in string 2
+    # get string 2 words not in string 1
+    # for each of those lists, each word, compare characters (using char compare)
+    # average all char compare scores
+    # multiply that by the remainder to add that as a factor into the score
+
+    # update the remainder
+    # get pos_score (call pos_compare)
+    # multiply pos_score and remainder and add that to the score to get final_score
+
+    final_score = word_score
+    return final_score
+
 def pos_compare(string1, string2, window=3):
     """Compare the positions of words in the two strings. Scored based on tolerance window, 3 words by default."""
     def makeDict(s):
@@ -37,7 +57,7 @@ def char_compare(string1, string2):
     char_raw_score = len(common_chars)/len(all_chars)
     return char_raw_score
 
-def compare(string1, string2):
+def word_compare(string1, string2):
     """Compare two sentences or phrases by word to determine similarity."""
     def sentence_to_set(s):
         return set(s.split())
@@ -53,10 +73,10 @@ def run():
     sample2 = "The easiest way to earn points with Fetch Rewards is to just shop for the items you already buy. If you have any eligible brands on your receipt, you will get points based on the total cost of the products. You do not need to cut out any coupons or scan individual UPCs. Just scan your receipt after you check out and we will find the savings for you."
     sample3 = "We are always looking for opportunities for you to earn more points, which is why we also give you a selection of Special Offers. These Special Offers are opportunities to earn bonus points on top of the regular points you earn every time you purchase a participating brand. No need to pre-select these offers, we'll give you the points whether or not you knew about the offer. We just think it is easier that way."
 
-    score = compare(sample1, sample2)
+    score = word_compare(sample1, sample2)
     msg1 = f'Sample 1 compared to sample 2: {score}'
 
-    score = compare(sample1, sample3)
+    score = word_compare(sample1, sample3)
     msg2 = f'Sample 1 compared to sample 3: {score}'
 
     return f'{msg1}\n{msg2}'
