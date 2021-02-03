@@ -9,17 +9,42 @@ def main_compare(string1, string2):
     remainder = 1 - word_score
 
     # for leftover non-matches compare characters
+    uncommon_words = set(string1.split()) ^ set(string2.split())
+    
     # get string 1 words not in string 2
+    string1_xor = []
     # get string 2 words not in string 1
+    string2_xor = []
+    for word in uncommon_words:
+        if word in string1.split():
+            string1_xor.append(word)
+        else:
+            string2_xor.append(word)
+    
     # for each of those lists, each word, compare characters (using char compare)
+    sim_char_count = 0
+    sim_char_score_total = 0
+    for word1 in string1_xor:
+        for word2 in string2_xor:
+            sim_char_count += 1
+            sim_char_score = char_compare(word1, word2)
+            sim_char_score_total += sim_char_score
+    
     # average all char compare scores
-    # multiply that by the remainder to add that as a factor into the score
-
+    final_char_score = sim_char_score_total/sim_char_count
+    
+    # multiply that by the remainder to add that as a factor into the overall score
+    final_score = word_score + remainder * final_char_score
+    
     # update the remainder
-    # get pos_score (call pos_compare)
-    # multiply pos_score and remainder and add that to the score to get final_score
+    remainder = 1 - final_score
 
-    final_score = word_score
+    # get pos_score (call pos_compare)
+    pos_score = pos_compare(string1, string2)
+
+    # multiply pos_score and remainder and add that to the score to get final_score
+    final_score += remainder * pos_score
+
     return final_score
 
 def pos_compare(string1, string2, window=3):
@@ -34,18 +59,19 @@ def pos_compare(string1, string2, window=3):
 
     dict1 = makeDict(string1)
     dict2 = makeDict(string2)
-    
+        
     pos_counter = 0
     pos_matches = 0
     for word, pos_list in dict1.items():
-        for pos in pos_list:
-            pos_counter += 1
-            upper_bound = pos + window
-            lower_bound = pos - window
-            for i in range(lower_bound, upper_bound):
-                if i in dict2[word]:
-                    pos_matches += 1
-                    break
+        if word in dict2.keys():
+            for pos in pos_list:
+                pos_counter += 1
+                upper_bound = pos + window
+                lower_bound = pos - window
+                for i in range(lower_bound, upper_bound):
+                    if i in dict2[word]:
+                        pos_matches += 1
+                        break
     
     pos_raw_score = pos_matches/pos_counter
     return pos_raw_score
@@ -73,10 +99,10 @@ def run():
     sample2 = "The easiest way to earn points with Fetch Rewards is to just shop for the items you already buy. If you have any eligible brands on your receipt, you will get points based on the total cost of the products. You do not need to cut out any coupons or scan individual UPCs. Just scan your receipt after you check out and we will find the savings for you."
     sample3 = "We are always looking for opportunities for you to earn more points, which is why we also give you a selection of Special Offers. These Special Offers are opportunities to earn bonus points on top of the regular points you earn every time you purchase a participating brand. No need to pre-select these offers, we'll give you the points whether or not you knew about the offer. We just think it is easier that way."
 
-    score = word_compare(sample1, sample2)
+    score = main_compare(sample1, sample2)
     msg1 = f'Sample 1 compared to sample 2: {score}'
 
-    score = word_compare(sample1, sample3)
+    score = main_compare(sample1, sample3)
     msg2 = f'Sample 1 compared to sample 3: {score}'
 
     return f'{msg1}\n{msg2}'
