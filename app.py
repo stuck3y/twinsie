@@ -6,9 +6,10 @@ app = Flask(__name__)
 
 @app.route('/')
 def run():
-    return f'Welcome to Twinsie where two strings of text are compared and given a score between 0 and 1. \
+    return f'Welcome to Twinsie!<br>This is where two strings of text are compared and given a score between 0 and 1. \
     <br><br> \
-    Send a POST request with text1 and text2 to our twinsie endpoint to compare the two strings of text.'
+    To compare two strings, send a POST request with `text1` and `text2` labeled in the JSON body to our `/twinsie` \
+    endpoint. The similarity score will be displayed in response.'
 
 @app.route('/twinsie', methods=['POST'])
 def twinsie():
