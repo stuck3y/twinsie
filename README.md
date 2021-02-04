@@ -1,14 +1,9 @@
-# twinsie
-Measure the similarity between two text strings
-
-
 [![Python](https://img.shields.io/badge/python-3.5%2C%203.6--dev-blue.svg)]()
-[![Requirements](https://requires.io/github/stuck3y/requirements.svg?branch=main)](https://requires.io/github/stuck3y/twinsie/requirements/?branch=main)
 [![Docker](https://img.shields.io/docker/automated/jrottenberg/ffmpeg.svg?maxAge=2592000)]()
 
 # twinsie!
 
-Minimal API that measures similarity between two pieces of text producing a score from 0 to 1.
+A minimal service that measures similarity between two pieces of text producing a score from 0 to 1.
 
 The overall score ranges from 0 (not similar at all) to 1 (perfectly
 similar, or exactly the same). Twinsie uses three methods to determine
@@ -26,7 +21,6 @@ final score. We take all of the common words and evaluate their position in
 one text string in relation to its position in the other text string. If it
 exist within the bounds of a pre-defined window, we consider that a "match"
 and that is factored into the final score.
-
 
 
 ## Getting started
@@ -51,6 +45,43 @@ There you will see instructions to send a POST request containing your two strin
 
 `http://localhost:5000/twinsie`
 
+### Sample Payload
+
+```
+{
+    "text1": "I love going to Five Guys Burgers and Fries for lunch",
+    "text2": "I think I might go to Five Guys to eat lunch today to celebrate the launch."
+}
+```
+Response:
+```
+text1: I love going to Five Guys Burgers and Fries for lunch
+
+text2: I think I might go to Five Guys to eat lunch today to celebrate the launch.
+
+sim_score = 0.4805263157894737
+
+########
+```
+
+Verbose Response:
+
+### Sample Call from Command Line with `cURL`
+
+```
+curl --data '{"text1": "I love going to Five Guys Burgers and Fries for lunch", "text2": "I think I might go to Five Guys to eat lunch today to celebrate the launch."}' http://localhost:5000/twinsie --header 'Content-Type: application/json' --header 'Accept: application/json'
+```
+
+Response:
+```
+text1: I love going to Five Guys Burgers and Fries for lunch
+
+text2: I think I might go to Five Guys to eat lunch today to celebrate the launch.
+
+sim_score = 0.4805263157894737
+
+########
+```
 
 ## Development
 
