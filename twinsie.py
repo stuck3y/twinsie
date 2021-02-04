@@ -8,11 +8,14 @@ class Twinsie:
         self.all_words = self.str1_words | self.str2_words
         self.uncommon_words = self.str1_words ^ self.str2_words
         self.score = 0
-        self.threshold = 0.5
+        self.fuzzy_threshold = 0.5
         
-    def _get_words(self, s):
+    def _get_words(self, s, unique=True):
         s = self._sanitize(s)
-        return set(s.split())
+        s = s.split()
+        if unique:
+            s = set(s)
+        return s
     
     def _sanitize(self, s):
         s = s.lower()
@@ -27,6 +30,7 @@ class Twinsie:
     def run(self):
         self.compare_words()
         self.compare_chars()
+        self.compare_word_pos()
         print(f'score = {self.score}')
 
     def compare_words(self):
@@ -51,6 +55,19 @@ class Twinsie:
         if self.score > 0:
             self.score = self.score + (fuzzy_score * remainder)
 
+    def compare_word_pos(self):
+        str1_pos_dict = self._get_positions_dict(self.str1)
+        str2_pos_dict = self._get_positions_dict(self.str2)
+
+        print(f'str1_pos_dict = {str1_pos_dict}')
+        print(f'str2_pos_dict = {str2_pos_dict}')
+
+    def _get_positions_dict(self, source_str):
+        s_dict = dict()
+        words = self._get_words(source_str, unique=False)
+        for word in words:
+            s_dict[word] = [i for i, x in enumerate(words) if x == word]
+        return s_dict
 
     def _fuzzy_match(self, source_word, target_words, threshold=None):
         """Check for a fuzzy match for source_word in target_words.
@@ -64,7 +81,7 @@ class Twinsie:
             threshold (float) Default `None` - strength of match requirement
         """
         if threshold == None:
-            threshold = self.threshold
+            threshold = self.fuzzy_threshold
 
         match_found = False 
         
