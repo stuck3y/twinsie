@@ -26,7 +26,7 @@ and that is factored into the final score.
 
 ## Getting started
 
-Install [docker](https://docs.docker.com/engine/installation/) and run:
+Install [docker](https://docs.docker.com/engine/installation/) and run the following from within this directory:
 
 ```shell
 docker-compose up --build
@@ -98,3 +98,11 @@ After making changes rebuild images and run the app:
 ```shell
 docker-compose build
 docker-compose run -p 5000:5000 web python app.py
+```
+
+Additional Note:
+Setting the `self.verbose` instance variable in the `Twinsie` module will unlock the "under the hood" summary of the score calculations.
+
+This can be helpful during local development and when making decisions about how to tweak and tune the various tolerance windows and thresholds for more accuracy (based on the common characteristics of the data you'll push to it).
+
+
