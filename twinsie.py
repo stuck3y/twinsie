@@ -10,7 +10,9 @@ class Twinsie:
         self.score = 0
         self.fuzzy_threshold = 0.5
         self.pos_window = 2
-        
+        self.char_score_scale = 0.95
+        self.pos_score_scale = 0.95
+    
     def _get_words(self, s, unique=True):
         s = self._sanitize(s)
         s = s.split()
@@ -54,7 +56,7 @@ class Twinsie:
         remainder = 1 - self.score
         print(f'remainder = {remainder}')
         if self.score > 0:
-            self.score = self.score + (fuzzy_score * remainder)
+            self.score = self.score + (fuzzy_score * remainder * self.char_score_scale)
     
     def _fuzzy_match(self, source_word, target_words, threshold=None):
         """Check for a fuzzy match for source_word in target_words.
@@ -78,8 +80,8 @@ class Twinsie:
             common_chars = word_chars & source_word_chars
             all_chars = word_chars | source_word_chars
             fuzzy_score = float(len(common_chars)) / float(len(all_chars))
-            print(f'fuzzy_score(target = {word}, source = {source_word}) = {fuzzy_score}')
             if fuzzy_score >= threshold:
+                print(f'fuzzy_score(target = {word}, source = {source_word}) = {fuzzy_score}')
                 match_found = True
         return match_found
 
@@ -87,6 +89,7 @@ class Twinsie:
         if window is None:
             window = self.pos_window
         pos_matches = 0
+        pos_counter = 0
 
         str1_pos_dict = self._get_positions_dict(self.str1)
         str2_pos_dict = self._get_positions_dict(self.str2)
@@ -94,24 +97,33 @@ class Twinsie:
         for word, positions in str1_pos_dict.items():
             if word in str2_pos_dict.keys():
                 for pos in positions:
-                    upper_bound = pos + window
-                    lower_bound = pos - window
-                    for i in range(lower_bound, upper_bound):
-                        if i in str2_pos_dict[word]:
-                            print(f'position matches for {word}')
-                            pos_matches += 1
-                            break
+                    if self._position_match(
+                        word, str2_pos_dict, 
+                        pos, window):
+                        pos_matches += 1
+                    pos_counter += 1         
 
         print(f'str1_pos_dict = {str1_pos_dict}')
         print(f'str2_pos_dict = {str2_pos_dict}')
         print(f'pos_matches total = {pos_matches}')
-        pos_score = float(pos_matches) / float(len(self.all_words))
+        print(f'pos_counter total = {pos_counter}')
+        
+        pos_score = float(pos_matches) / float(pos_counter)
         print(f'pos_score = {pos_score}')
 
         remainder = 1 - self.score
         print(f'remainder = {remainder}')
         if self.score > 0:
-            self.score = self.score + (pos_score * remainder)
+            self.score = self.score + (pos_score * remainder * self.pos_score_scale)
+
+    def _position_match(self, word, target_dict, position, window):
+        upper_bound = position + window
+        lower_bound = position - window
+        for i in range(lower_bound, upper_bound):
+            if i in target_dict[word]:
+                print(f'position matches for {word}')
+                return True
+        return False
 
     def _get_positions_dict(self, source_str):
         s_dict = dict()
