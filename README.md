@@ -26,7 +26,7 @@ and that is factored into the final score.
 
 ## Getting started
 
-Install [docker](https://docs.docker.com/engine/installation/) and run the following from within this directory:
+Install [docker](https://docs.docker.com/engine/installation/) and run the following from within this directory (after cloning the repo):
 
 ```shell
 docker-compose up --build
