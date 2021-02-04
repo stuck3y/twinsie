@@ -23,6 +23,7 @@ exist within the bounds of a pre-defined window, we consider that a "match"
 and that is factored into the final score.
 
 
+
 ## Getting started
 
 Install [docker](https://docs.docker.com/engine/installation/) and run:
@@ -45,6 +46,7 @@ There you will see instructions to send a POST request containing your two strin
 
 `http://localhost:5000/twinsie`
 
+
 ### Sample Payload
 
 ```
@@ -64,11 +66,10 @@ sim_score = 0.4805263157894737
 ########
 ```
 
-Verbose Response:
 
 ### Sample Call from Command Line with `cURL`
 
-```
+```shell
 curl --data '{"text1": "I love going to Five Guys Burgers and Fries for lunch", "text2": "I think I might go to Five Guys to eat lunch today to celebrate the launch."}' http://localhost:5000/twinsie --header 'Content-Type: application/json' --header 'Accept: application/json'
 ```
 
@@ -83,9 +84,14 @@ sim_score = 0.4805263157894737
 ########
 ```
 
+### Sample call from [Postman](https://www.postman.com/downloads/)
+![](postman_sample.png)
+
+
+
 ## Development
 
-Create a new branch off the **develop** branch for features or fixes.
+Create a new branch off the **development** branch for features or fixes.
 
 After making changes rebuild images and run the app:
 
