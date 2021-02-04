@@ -15,4 +15,4 @@ class Twinsie:
         score = self.compare_words()
 
     def compare_words(self):
-        return len(self.common_words)/len(self.all_words)
+        return float(len(self.common_words))/float(len(self.all_words))
