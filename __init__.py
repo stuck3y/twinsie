@@ -1,1 +1,1 @@
-from . import Twinsie
+from .twinsie import Twinsie

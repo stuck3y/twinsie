@@ -34,7 +34,8 @@ class Twinsie:
         self.compare_words()
         self.compare_chars()
         self.compare_word_pos()
-        print(f'score = {self.score}')
+        # print(f'score = {self.score}')
+        return f'score = {self.score}'
 
     def compare_words(self):
         self.score = float(len(self.common_words))/float(len(self.all_words))
@@ -106,9 +107,10 @@ class Twinsie:
         print(f'str1_pos_dict = {str1_pos_dict}')
         print(f'str2_pos_dict = {str2_pos_dict}')
         print(f'pos_matches total = {pos_matches}')
-        print(f'pos_counter total = {pos_counter}')
+        pos_total = self._get_pos_total()
+        print(f'pos_counter total = {pos_total}')
         
-        pos_score = float(pos_matches) / float(pos_counter)
+        pos_score = float(pos_matches) / pos_total
         print(f'pos_score = {pos_score}')
 
         remainder = 1 - self.score
@@ -131,3 +133,18 @@ class Twinsie:
         for word in words:
             s_dict[word] = [i for i, x in enumerate(words) if x == word]
         return s_dict
+
+    def _get_pos_total(self):
+        """Set total word positions to the max word list length between the two strings.
+
+        This is the conservative choice since it's better that order of words have too
+        little of a say in the final score than too much.
+
+        Returns: 
+            pos_total (float): max length of words list 
+        """
+        str1_word_count = float(len(self._get_words(self.str1, unique=False)))
+        str2_word_count = float(len(self._get_words(self.str2, unique=False)))
+        if str1_word_count > str2_word_count:
+            return str1_word_count
+        return str2_word_count
