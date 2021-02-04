@@ -43,7 +43,13 @@ class Twinsie:
                     fuzzy_match_count += 1
         
         print(f'fuzzy_match_count = {fuzzy_match_count}')
-        print(f'fuzzy_match_count/self.all_words = {float(fuzzy_match_count)/float(len(self.all_words))}')
+        fuzzy_score = float(fuzzy_match_count)/float(len(self.all_words))
+        print(f'fuzzy_match_count/self.all_words = {fuzzy_score}')
+
+        remainder = 1 - self.score
+        print(f'remainder = {remainder}')
+        if self.score > 0:
+            self.score = self.score + (fuzzy_score * remainder)
 
 
     def _fuzzy_match(self, source_word, target_words, threshold=None):
