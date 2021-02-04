@@ -1,4 +1,5 @@
 from flask import Flask
+from flask import request
 
 app = Flask(__name__)
 
@@ -6,6 +7,9 @@ def main_compare(string1, string2):
     
     # compare words - simplest
     word_score = word_compare(string1, string2)
+    if word_score == 0:
+        return str(0)
+        
     remainder = 1 - word_score
 
     # for leftover non-matches compare characters
@@ -72,8 +76,9 @@ def pos_compare(string1, string2, window=3):
                     if i in dict2[word]:
                         pos_matches += 1
                         break
-    
-    pos_raw_score = pos_matches/pos_counter
+    pos_raw_score = 0
+    if pos_counter > 0:
+        pos_raw_score = pos_matches/pos_counter
     return pos_raw_score
 
 def char_compare(string1, string2):
@@ -107,3 +112,7 @@ def run():
 
     return f'{msg1}\n{msg2}'
 
+@app.route('/compare', methods=['POST'])
+def compare():
+    req = request.get_json()
+    return str(main_compare(req['text1'], req['text2']))
