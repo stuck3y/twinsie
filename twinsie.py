@@ -4,7 +4,7 @@ class Twinsie:
     The overall score ranges from 0 (not similar at all) to 1 (perfectly
     similar, or exactly the same). Twinsie uses three methods to determine
     this score. First, it looks at common words in comparison to all of the words.
-    This is similar to the Jaccard's distance calculation. This is the most basic 
+    This is similar to the Jaccard distance calculation. This is the most basic 
     of the three methods and can be a poor similarity method on its own. 
     
     To mitigate that, and add more precision, method two attempts to take all 
@@ -19,16 +19,22 @@ class Twinsie:
     and that is factored into the final score.
 
     """
-    def __init__(self, str1, str2):
+    def __init__(self, str1, str2, verbose=False):
         """The class takes in the two text strings as parameters.
 
         In the init (constructor), I preset some of the most frequent operations
         including union, intersecting and xor'ing the set/list that consists of
         the words in the strings passed in.
 
+        If you are interested in the ongoing calculation details, the `verbose`
+        flag can be passed in as True and a summary will accompany the displayed
+        results/score.
+
         Args:
             str1 (str): text string number one
-            str1 (str): text string number two
+            str2 (str): text string number two
+        Keyword Args:
+            verbose (bool) `default: False` - show calculation details
         """
         self.str1 = str1
         self.str2 = str2
@@ -42,6 +48,8 @@ class Twinsie:
         self.pos_window = 2
         self.char_score_scale = 0.95
         self.pos_score_scale = 0.95
+        self.verbose = verbose
+        self.summary = []
     
     def _get_words(self, s, unique=True):
         """Sanitize and split up the string into the words that make it up.
@@ -81,8 +89,22 @@ class Twinsie:
         self.compare_words()
         self.compare_chars()
         self.compare_word_pos()
-        # print(f'score = {self.score}')
-        return f'score = {self.score}'
+        return self.get_display_msg()
+
+    def get_display_msg(self):
+        """Set the final response to display back to user."""
+        display_msg = (
+            f'text1: {self.str1}\n\n' \
+            f'text2: {self.str2}\n\n' \
+            f'sim_score = {self.score}\n\n' \
+            f'########\n\n')
+        if self.verbose:
+            summary = self._summarize()
+            display_msg += f'{summary}'
+        return display_msg
+
+    def _summarize(self):
+        return '\n'.join(self.summary)
 
     def compare_words(self):
         """Calculate a basic score with common words divided by all words."""
@@ -116,12 +138,12 @@ class Twinsie:
                 if self._fuzzy_match(word, self.str1_words):
                     fuzzy_match_count += 1
         
-        print(f'fuzzy_match_count = {fuzzy_match_count}')
+        self.summary.append(f'fuzzy_match_count = {fuzzy_match_count}')
         fuzzy_score = float(fuzzy_match_count)/float(len(self.all_words))
-        print(f'fuzzy_match_count/self.all_words = {fuzzy_score}')
+        self.summary.append(f'fuzzy_match_count/self.all_words = {fuzzy_score}')
 
         remainder = 1 - self.score
-        print(f'remainder = {remainder}')
+        self.summary.append(f'remainder = {remainder}')
         if self.score > 0:
             self.score = self.score + (fuzzy_score * remainder * self.char_score_scale)
     
@@ -150,7 +172,7 @@ class Twinsie:
             all_chars = word_chars | source_word_chars
             fuzzy_score = float(len(common_chars)) / float(len(all_chars))
             if fuzzy_score >= threshold:
-                print(f'fuzzy_score(target = {word}, source = {source_word}) = {fuzzy_score}')
+                self.summary.append(f'fuzzy_score(target = {word}, source = {source_word}) = {fuzzy_score}')
                 match_found = True
         return match_found
 
@@ -192,17 +214,17 @@ class Twinsie:
                         pos_matches += 1
                     pos_counter += 1         
 
-        print(f'str1_pos_dict = {str1_pos_dict}')
-        print(f'str2_pos_dict = {str2_pos_dict}')
-        print(f'pos_matches total = {pos_matches}')
+        self.summary.append(f'str1_pos_dict = {str1_pos_dict}')
+        self.summary.append(f'str2_pos_dict = {str2_pos_dict}')
+        self.summary.append(f'pos_matches total = {pos_matches}')
         pos_total = self._get_pos_total()
-        print(f'pos_counter total = {pos_total}')
+        self.summary.append(f'pos_counter total = {pos_total}')
         
         pos_score = float(pos_matches) / pos_total
-        print(f'pos_score = {pos_score}')
+        self.summary.append(f'pos_score = {pos_score}')
 
         remainder = 1 - self.score
-        print(f'remainder = {remainder}')
+        self.summary.append(f'remainder = {remainder}')
         if self.score > 0:
             self.score = self.score + (pos_score * remainder * self.pos_score_scale)
 
@@ -221,7 +243,7 @@ class Twinsie:
         lower_bound = position - window
         for i in range(lower_bound, upper_bound):
             if i in target_dict[word]:
-                print(f'position matches for {word}')
+                self.summary.append(f'position matches for {word}')
                 return True
         return False
 
