@@ -12,4 +12,7 @@ class Twinsie:
         return set(s.split())
 
     def run(self):
-        pass
+        score = self.compare_words()
+
+    def compare_words(self):
+        return len(self.common_words)/len(self.all_words)
